@@ -1,0 +1,17 @@
+# Docker Model Runner is a feature of the Docker Desktop / Docker Engine
+# daemon itself, not a container you start with `docker compose up` — there
+# is no image to run here. See README.md for the `docker model` CLI setup
+# that gets Gemma serving its OpenAI-compatible API on localhost:12434.
+#
+# This file is only useful if you want the model wired into OTHER compose
+# services via Compose's model-provider integration (Compose v2.35+ /
+# Docker Desktop 4.41+), which injects connection details as env vars into
+# any service that depends on it. The apps in this series are standalone
+# `uv` scripts run on the host, so they don't need this — they just talk to
+# http://localhost:12434 directly.
+services:
+  gemma:
+    provider:
+      type: model
+      options:
+        model: docker.io/ai/gemma4:E4B
