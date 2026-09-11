@@ -16,14 +16,7 @@ SYSTEM_PROMPT = (
 
 @tool
 def web_search(query: str) -> dict:
-    """Search the web for current information about a topic.
-
-    Args:
-        query: A focused search query string.
-
-    Returns:
-        A dict with 'results' and metadata.
-    """
+    """Search the web for current information."""
     with DDGS() as ddgs:
         raw = list(ddgs.text(query, max_results=3))
     results = [{"title": r["title"], "url": r["href"], "body": r["body"]} for r in raw]
@@ -33,23 +26,18 @@ TOOLS = [web_search]
 TOOLS_BY_NAME = {t.name: t for t in TOOLS}
 
 def run_turn_v1(llm_with_tools, messages: list) -> str:
-    """Single tool hop execution without retries."""
     response = llm_with_tools.invoke(messages)
 
     if not response.tool_calls:
         return response.content
 
-    # 1. Append assistant response with tool_calls FIRST
     messages.append(response)
 
     for call in response.tool_calls:
         tool_fn = TOOLS_BY_NAME[call["name"]]
-        # call["args"] is already a parsed dictionary
         content = str(tool_fn.invoke(call["args"]))
-        # 2. Append ToolMessage tied to the specific call by tool_call_id
         messages.append(ToolMessage(content=content, tool_call_id=call["id"]))
 
-    # 3. Model answers using the ToolMessage context
     return llm_with_tools.invoke(messages).content
 
 def main():

@@ -18,14 +18,7 @@ MAX_TOOL_RETRIES = 2
 
 @tool
 def web_search(query: str) -> dict:
-    """Search the web for current information about a topic.
-
-    Args:
-        query: A focused search query string.
-
-    Returns:
-        A dict with 'results' and metadata.
-    """
+    """Search the web for current information."""
     with DDGS() as ddgs:
         raw = list(ddgs.text(query, max_results=3))
     results = [{"title": r["title"], "url": r["href"], "body": r["body"]} for r in raw]
@@ -35,7 +28,6 @@ TOOLS = [web_search]
 TOOLS_BY_NAME = {t.name: t for t in TOOLS}
 
 def run_turn(llm_with_tools, messages: list) -> str:
-    """Handle one user turn with bounded retries and error guardrails."""
     for _ in range(MAX_TOOL_RETRIES + 1):
         response = llm_with_tools.invoke(messages)
 

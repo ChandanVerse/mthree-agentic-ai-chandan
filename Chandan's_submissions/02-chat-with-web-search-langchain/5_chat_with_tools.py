@@ -22,17 +22,7 @@ MAX_TOOL_RETRIES = 2
 
 @tool
 def web_search(query: str) -> dict:
-    """Search the web for current information about a topic.
-
-    Use this tool only when you need real-time or recent information
-    that you don't already know - news, current events, prices, etc.
-
-    Args:
-        query: A focused search query (not a question, not a URL).
-
-    Returns:
-        A dict with 'results' (list of {title, url, body}) and metadata.
-    """
+    """Search the web for current information."""
     with DDGS() as ddgs:
         raw = list(ddgs.text(query, max_results=MAX_RESULTS))
     results = [{"title": r["title"], "url": r["href"], "body": r["body"]} for r in raw]
@@ -42,7 +32,6 @@ TOOLS = [web_search]
 TOOLS_BY_NAME = {t.name: t for t in TOOLS}
 
 def run_turn(llm_with_tools, messages: list) -> str:
-    """Handle one user turn: at most one tool hop, bounded retries, then final answer."""
     for _ in range(MAX_TOOL_RETRIES + 1):
         response = llm_with_tools.invoke(messages)
 
@@ -72,7 +61,6 @@ def run_turn(llm_with_tools, messages: list) -> str:
     return "I could not complete that after a few tries - please rephrase."
 
 def chat_loop(model: str = DEFAULT_MODEL, base_url: str = DEFAULT_BASE_URL, api_key: str = API_KEY) -> None:
-    """Interactive REPL loop with LangChain tool calling."""
     llm = ChatOpenAI(model=model, base_url=base_url, api_key=api_key, temperature=0)
     llm_with_tools = llm.bind_tools(TOOLS)
     messages: list = [SystemMessage(content=SYSTEM_PROMPT)]
@@ -101,7 +89,6 @@ def chat_loop(model: str = DEFAULT_MODEL, base_url: str = DEFAULT_BASE_URL, api_
             break
 
         print(f"Assistant: {answer}\n")
-        # Single place responsible for appending visible reply into history
         messages.append(AIMessage(content=answer))
 
 def main():

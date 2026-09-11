@@ -16,14 +16,7 @@ SYSTEM_PROMPT = (
 
 @tool
 def web_search(query: str) -> dict:
-    """Search the web for current information about a topic.
-
-    Args:
-        query: A focused search query string.
-
-    Returns:
-        A dict with 'results' and metadata.
-    """
+    """Search the web for current information."""
     with DDGS() as ddgs:
         raw = list(ddgs.text(query, max_results=3))
     results = [{"title": r["title"], "url": r["href"], "body": r["body"]} for r in raw]
@@ -36,8 +29,8 @@ def main():
     llm_with_tools = llm.bind_tools(TOOLS)
 
     test_questions = [
-        "What is 12 * 7?",                               # Should NOT trigger tool
-        "Who won the most recent F1 world championship?", # SHOULD trigger tool
+        "What is 12 * 7?",
+        "Who won the most recent F1 world championship?",
     ]
 
     print(f"Testing raw model decisions with {MODEL} via {BASE_URL}...\n")

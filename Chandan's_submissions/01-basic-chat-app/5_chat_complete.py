@@ -15,7 +15,6 @@ SYSTEM_PROMPT = (
 MAX_TURNS_KEPT = 12
 
 def trim_history(messages: list[dict], max_turns: int = MAX_TURNS_KEPT) -> list[dict]:
-    """Keep the system prompt plus only the most recent max_turns turns."""
     if not messages:
         return messages
     system, *turns = messages

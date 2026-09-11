@@ -6,14 +6,7 @@ MAX_RESULTS = 5
 
 @tool
 def web_search(query: str) -> dict:
-    """Search the web for current information about a topic.
-
-    Args:
-        query: A focused search query string.
-
-    Returns:
-        A dict with 'results' and metadata.
-    """
+    """Search the web for current information."""
     with DDGS() as ddgs:
         raw = list(ddgs.text(query, max_results=MAX_RESULTS))
     results = [{"title": r["title"], "url": r["href"], "body": r["body"]} for r in raw]
